@@ -1,6 +1,9 @@
 from tkinter import *
 from PIL import ImageTk, Image
 import webbrowser
+from tkinter import messagebox
+from tkinter import filedialog
+import os
 
 ######################
 # Creating Functions #
@@ -9,22 +12,51 @@ import webbrowser
 
 # Creating new file
 def newFile():
-    pass
+    global file
+    root.title("Untitled - Durga Text Editor")
+    file = None
+    TextArea.delete(1.0, END)
 
 
 # Opening old file
 def openFile():
-    pass
+    global file
+    file = filedialog.askopenfilename(defaultextension=".txt", filetypes=[("All Files", "*.*"),("Text Document", "*.txt"), ("Python Files", "*.py")])
+
+    if file == "":
+        file = None
+    else:
+        root.title(os.path.basename(file)+" - Durga Text Editor")
+        TextArea.delete(1.0, END)
+        f = open(file, "r")
+        TextArea.insert(1.0, f.read())
+        f.close()
 
 
 # Saving current file
 def saveFile():
-    pass
+    global  file
+    if file == None:
+        file = filedialog.asksaveasfilename(initialfile='Untitled.txt', defaultextension=".txt", filetypes=[("All Files", "*.*"),("Text Document", "*.txt"), ("Python Files", "*.py")])
+
+        if file == "":
+            file = None
+        else:
+            f = open(file, "w")
+            f.write(TextArea.get(1.0, END))
+            f.close()
+            root.title(os.path.basename(file)+" - Durga Text Editor")
+            print("File Saved")
+
+    else:
+        f = open(file, "w")
+        f.write(TextArea.get(1.0, END))
+        f.close()
 
 
 # Exiting from text editor
 def exitEditor():
-    pass
+    root.quit()
 
 
 # Creating cut, copy, paste functions
@@ -46,8 +78,8 @@ def callback(url):
 
 
 # Creating about function
-def about():
-    root.iconify()
+def about_dev():
+    # root.iconify()
     about = Toplevel()
     about.title("About")
     about.geometry("500x450")
@@ -99,7 +131,7 @@ def about():
 
     # Creating Close About Window Function
     def close_about():
-        root.deiconify()
+        # root.deiconify()
         about.destroy()
 
     # Adding Close Button
@@ -107,6 +139,10 @@ def about():
     close_btn.grid(row=4, column=0, columnspan=3, pady=40)
 
     about.mainloop()
+
+
+def about_durga_text_editor():
+    messagebox.showinfo("About Durga Text Editor", "Thanks for using Durga,\na simple text editor,\nbuilt in python.")
 
 
 if __name__ == '__main__':
@@ -118,6 +154,7 @@ if __name__ == '__main__':
     root.title("Untitled - Durga Text Editor")
     root.iconphoto(True, PhotoImage(file="/home/soumyo/PycharmProjects/Durga Text Editor/files/icons/icon.png"))
     root.geometry("644x788")
+    root.attributes("-zoomed", True)
 
     ######################################
     # Adding Text Widget for Typing Text #
@@ -156,40 +193,26 @@ if __name__ == '__main__':
     # Create Help Sub-menu
     help_menu = Menu(my_menu, tearoff=0)
     my_menu.add_cascade(label="Help", menu=help_menu)
-    help_menu.add_command(label="About", command=about)
+    help_menu.add_command(label="Developer Info", command=about_dev)
+    help_menu.add_command(label="About", command=about_durga_text_editor)
 
-    ######################
-    # Adding a Scrollbar #
-    ######################
-    scrollbar = Scrollbar(TextArea)
-    scrollbar.pack(side=RIGHT, fill=Y)
-    scrollbar.config(command=TextArea.yview)
-    TextArea.config(yscrollcommand=scrollbar.set)
+    #####################
+    # Adding Scrollbars #
+    #####################
 
+    # Creating a vertical ScrollBar
+    y_scrollbar = Scrollbar(TextArea)
+    y_scrollbar.pack(side=RIGHT, fill=Y)
+    y_scrollbar.config(command=TextArea.yview)
+    TextArea.config(yscrollcommand=y_scrollbar.set)
 
+    # Creating a horizontal ScrollBar
+    x_scrollbar = Scrollbar(TextArea, orient=HORIZONTAL)
+    x_scrollbar.pack(side=BOTTOM, fill=X)
+    x_scrollbar.config(command=TextArea.xview)
+    TextArea.config(wrap="none", xscrollcommand=x_scrollbar.set)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    ####################################
+    # Adding Line Numbers on Left Side #
+    ####################################
 root.mainloop()
